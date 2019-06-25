@@ -9,4 +9,4 @@ Terminal interface program that allows user to send commands to the Arduino
 Obsolete matlab code for interfacing with Arduino
 
 ## obsolete_MagnetSwitcher
-Arduino code for the Magnet Switcher designed by Daniel Luncasu. This code is no longer useable with the current system.
+Obsolete Arduino code for the Magnet Switcher designed by Daniel Luncasu. This code is no longer useable with the current system.
