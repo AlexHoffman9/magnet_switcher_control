@@ -5,5 +5,8 @@ Current Arduino code for the Magnet Switcher PCB and Arduino Mega shield designe
 ## magnetswitcher.py
 Terminal interface program that allows user to send commands to the Arduino
 
-## MagnetSwitcher_obsolete
+## magnetswitcher.m
+Obsolete matlab code for interfacing with Arduino
+
+## obsolete_MagnetSwitcher
 Arduino code for the Magnet Switcher designed by Daniel Luncasu. This code is no longer useable with the current system.
