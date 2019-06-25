@@ -1,4 +1,5 @@
 #define STARTUP_DELAY 2000
+#define COMMAND_LENGTH 12
 #define PIN_P2 11
 #define PIN_P1 9
 #define PIN_N1_N 10
@@ -18,7 +19,8 @@ volatile boolean commandReady = false;
 long lastLoop = 0;
 long delayValue = 500000;
 int currentCircuit = 0;
-boolean circuitOn = true;
+//boolean circuitOn = true;
+boolean circuitOn = false; // leaving off while testing
 
 void setup() {
   commandBuffer.reserve(200);
@@ -109,9 +111,9 @@ void loop() {
   while (Serial.available()) {
       commandBuffer += (char)Serial.read();
   }
-  if (commandBuffer != "") {
+  if (commandBuffer.length() >= COMMAND_LENGTH) { // check if full command received
         commandReady = true;
-        commandIn = commandBuffer;
+        commandIn = commandBuffer.substring(0,COMMAND_LENGTH); // this works for exactly 8 chars. improve by just grabbing 1st 8 chars
         commandBuffer = "";
   }
   
@@ -134,18 +136,18 @@ void loop() {
 // FREQ XX -- sets the frequency in Hz, where XX is the desired frequency
 
 boolean handleCommand(String in) {
-  if (in == "STOP") {
+  if (in.substring(0,4) == "STOP") {
     Serial.println("Halting circuit");
     circuitOn = false;
     circuitHalt();
     return true;
   }
-  if (in == "START") {
+  if (in.substring(0,5) == "START") {
     Serial.println("Starting circuit");
     circuitOn = true;
     return true;
   }
-  if (in.substring(0, 5) == "FREQ " && in.length() >= 6) {
+  if (in.substring(0, 5) == "FREQ ") {
     String freq = in.substring(5);
     float convertedValue = freq.toFloat();
     if (convertedValue > 0) {
