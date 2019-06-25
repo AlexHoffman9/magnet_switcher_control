@@ -10,9 +10,9 @@ try:
     running = True 
     while running:
         command_str = input('Enter command: START, STOP, FREQ #, QUIT ')
-        if command_str == 'QUIT': # end python program
+        if command_str == 'QUIT': # stop switching and end python program
             command_str = 'STOP'
-            running = False # breaks out of loop afer sending stop command
+            running = False
         # find length of command
         commandLength = len(command_str)
         # add padding so length is correct
