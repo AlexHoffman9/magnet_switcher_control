@@ -1,22 +1,10 @@
-#define STARTUP_DELAY 2000
-#define COMMAND_LENGTH 12
-#define PIN_P2_A 11
-#define PIN_P1_A 9
-#define PIN_N1_A 10
-#define PIN_N2_A 12
-#define PIN_P2_B 7
-#define PIN_P1_B 2
-#define PIN_N1_B 3
-#define PIN_N2_B 8
-#define PIN_P2_C 24
-#define PIN_P1_C 28
-#define PIN_N1_C 26
-#define PIN_N2_C 22
+// MagnetSwitcher_2019_3coil.ino
+// Alex Hoffman, University of Washingoton
+// This code runs on an Arduino Mega to drive the MagnetSwitcher PCB I designed for the CIMS lab
+// To interact with this code, use the python script (maybe GUI in future) located in the github repo
+// Always use caution when operating high voltage electronics
 
-#define PMOS_ON HIGH // pulls H bridge gate low to turn on PMOS
-#define PMOS_OFF LOW
-#define NMOS_ON LOW // pulls H bridge gate high to turn on NMOS
-#define NMOS_OFF HIGH
+#include "MagnetSwitcher_2019_3coil.h" //defines pins, functions to turn on/off H bridge
 
 // Variables to hold command input
 String commandBuffer = "";
@@ -27,6 +15,7 @@ volatile boolean commandReady = false;
 long lastLoop = 0;
 long delayValue = 500000;
 int currentCircuit = 0;
+//int circuitDirection = 1; use later to reverse rotation direction
 //boolean circuitOn = true;
 boolean circuitOn = false; // leaving off while testing
 
@@ -45,83 +34,49 @@ void setup() {
   pinMode(PIN_N1_C, OUTPUT);
   pinMode(PIN_P2_C, OUTPUT);
   pinMode(PIN_P1_C, OUTPUT);
-  digitalWrite(PIN_N2_A, NMOS_OFF);
-  digitalWrite(PIN_N1_A, NMOS_OFF);
-  digitalWrite(PIN_P2_A, PMOS_OFF);
-  digitalWrite(PIN_P1_A, PMOS_OFF);
-
+  circuitHalt('A');
+  circuitHalt('B');
+  circuitHalt('C');
   Serial.begin(115200);
   delay(STARTUP_DELAY);
 }
 
-// shuts off current to coil, do not leave an nmos on...this can cause shoot through
-void circuitHalt(int p) {
-  noInterrupts();
-  digitalWrite(PIN_P1_A, PMOS_OFF);
-  digitalWrite(PIN_P2_A, PMOS_OFF);
-  digitalWrite(PIN_N2_A, NMOS_OFF);
-  digitalWrite(PIN_N1_A, NMOS_OFF);
-  interrupts();
-}
-
-// Turns on pair 1
-void circuit_A() {
-  noInterrupts();
-  // These should be off
-  digitalWrite(PIN_N2_A, NMOS_OFF);
-  digitalWrite(PIN_P1_A, PMOS_OFF);
-  // These should be on
-  digitalWrite(PIN_P2_A, PMOS_ON);
-  digitalWrite(PIN_N1_A, NMOS_ON);
-  interrupts();
-}
-
-// Turns on pair 2
-void circuit_B() {
-  noInterrupts();
-  // These should be off
-  digitalWrite(PIN_N1_A, NMOS_OFF);
-  digitalWrite(PIN_P2_A, PMOS_OFF);
-  // These should be on
-  digitalWrite(PIN_P1_A, PMOS_ON);
-  digitalWrite(PIN_N2_A, NMOS_ON);
-  interrupts();
-}
-
-
-
+// Continuously loops
 void loop() {
   // First: If micros has overflowed, make sure to reset lastLoop and halt the circuit
   // also if the circuit is stopped it halts constantly
   if (micros() < lastLoop || circuitOn == false) {
     noInterrupts();
     lastLoop = micros();
-    circuitHalt();
+    circuitHalt('A');
+    circuitHalt('B');
     interrupts();
   }
 
-  //noInterrupts(); caused loop to fail
   // Check to see if time elapsed > delayValue
   if (micros()-lastLoop > delayValue) {
-    
+    // time to rotate magnetic field
     lastLoop = micros();
-    circuitHalt(); // For safety
+    circuitHalt('A'); // For safety
+    circuitHalt('B');
     switch (currentCircuit) {
       case 0: currentCircuit = 1;
-              circuit_A();
+              circuitActivateForward('A'); // CAUSES 25 US SPIKE ON CIRCUIT B FORWARD
+              circuitHalt('B'); 
               break;
       case 1: currentCircuit = 2;
-              circuitHalt();
+              circuitHalt('A');
+              circuitActivateForward('B');
               break;
       case 2: currentCircuit = 3;
-              circuit_B();
+              circuitActivateReverse('A'); // CAUSES 25 us SPIKE ON CIRCUIT B REVERSE
+              circuitHalt('B');
               break;
       case 3: currentCircuit = 0;
-              circuitHalt();
+              circuitHalt('A');
+              circuitActivateReverse('B');
               break;
-      
     }
-    //interrupts();
   }
   
   while (Serial.available()) {
@@ -130,17 +85,17 @@ void loop() {
   if (commandBuffer.length() >= COMMAND_LENGTH) { // check if full command received
         commandReady = true;
         commandIn = commandBuffer.substring(0,COMMAND_LENGTH); // this works for exactly 8 chars. improve by just grabbing 1st 8 chars
-        commandBuffer = "";
+        commandBuffer = ""; // ignore possibility of pending command after this one
   }
   
   if (commandReady) {
     if (handleCommand(commandIn) == false) {
       //Serial.println(commandIn);
       Serial.println("Error, halting circuit");
-      circuitHalt();
+      circuitHalt('A');
+      circuitHalt('B');
       circuitOn = false;
     }
-
     commandReady = false;
   }
 }
@@ -155,7 +110,8 @@ boolean handleCommand(String in) {
   if (in.substring(0,4) == "STOP") {
     Serial.print("Halting circuit");
     circuitOn = false;
-    circuitHalt();
+    circuitHalt('A');
+    circuitHalt('B');
     return true;
   }
   if (in.substring(0,5) == "START") {
@@ -174,7 +130,5 @@ boolean handleCommand(String in) {
       return true;
     }
   }
-
-
   return false;
 }
