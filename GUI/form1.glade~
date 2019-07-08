@@ -56,7 +56,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="max_length">3</property>
-                <property name="max_width_chars">4</property>
+                <property name="max_width_chars">3</property>
                 <property name="adjustment">freq_adjustment</property>
                 <property name="climb_rate">0.10000000000000001</property>
                 <property name="digits">1</property>
