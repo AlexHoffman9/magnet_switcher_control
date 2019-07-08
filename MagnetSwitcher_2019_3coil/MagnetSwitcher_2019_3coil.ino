@@ -132,9 +132,11 @@ boolean handleCommand(String in) {
   if (in.substring(0,4) == "DIR ") {
     String dir = in.substring(4,5);
     if (dir == "+") {
+      Serial.print("+ DIR");
       circuitDirection = 1;
       return true;
     } if (dir == "-") {
+      Serial.print("- DIR");
       circuitDirection = -1;
       return true;
     }
