@@ -60,7 +60,7 @@ void loop() {
     circuitHalt('A'); // For safety
     circuitHalt('B');
     switch (currentCircuit) {
-      case 0: currentCircuit = 1;
+      case 0: currentCircuit = 1; // change to currentCirccuit += direction
               circuitActivateForward('A'); // CAUSES 25 US SPIKE ON CIRCUIT B FORWARD
               circuitHalt('B'); 
               break;
