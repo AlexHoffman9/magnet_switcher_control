@@ -45,6 +45,7 @@ void circuitHalt(char coil) {
 }
 
 // Turns on pair 1 of h bridge
+// using a switch statement caused glitchy pins, so used if/else
 void circuitActivateForward(char coil) {
     if (coil=='A') {
       noInterrupts();
