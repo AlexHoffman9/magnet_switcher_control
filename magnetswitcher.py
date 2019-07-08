@@ -4,12 +4,13 @@ print('Commands: ')
 print('START: starts switching')
 print('STOP: stops switching')
 print('FREQ #: changes switching frequency. # is float frequency in Hz')
+print('DIR +: sets rotation direction to forward, - for backward')
 print('QUIT: stops switching and exits this code')
 try:
     ser = serial.Serial('COM3', 115200, timeout = 1)  
     running = True 
     while running:
-        command_str = input('Enter command: START, STOP, FREQ #, QUIT ')
+        command_str = input('Enter command: START, STOP, FREQ #, DIR _, QUIT ')
         if command_str == 'QUIT': # stop switching and end python program
             command_str = 'STOP'
             running = False

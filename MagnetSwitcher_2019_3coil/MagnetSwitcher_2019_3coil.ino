@@ -15,8 +15,7 @@ volatile boolean commandReady = false;
 long lastLoop = 0;
 long delayValue = 500000;
 int currentCircuit = 0;
-//int circuitDirection = 1; use later to reverse rotation direction
-//boolean circuitOn = true;
+int circuitDirection = 1; //use to reverse rotation direction
 boolean circuitOn = false; // leaving off while testing
 
 void setup() {
@@ -60,19 +59,19 @@ void loop() {
     circuitHalt('A'); // For safety
     circuitHalt('B');
     switch (currentCircuit) {
-      case 0: currentCircuit = 1;
-              circuitActivateForward('A'); // CAUSES 25 US SPIKE ON CIRCUIT B FORWARD
-              circuitHalt('B'); 
+      case 0: currentCircuit = (currentCircuit + circuitDirection+4)%4; // moves to case 1 if forward, case 3 if reverse
+              circuitActivateForward('A');
+              circuitHalt('B');
               break;
-      case 1: currentCircuit = 2;
+      case 1: currentCircuit = (currentCircuit + circuitDirection)%4;
               circuitHalt('A');
               circuitActivateForward('B');
               break;
-      case 2: currentCircuit = 3;
-              circuitActivateReverse('A'); // CAUSES 25 us SPIKE ON CIRCUIT B REVERSE
+      case 2: currentCircuit = (currentCircuit + circuitDirection)%4;
+              circuitActivateReverse('A');
               circuitHalt('B');
               break;
-      case 3: currentCircuit = 0;
+      case 3: currentCircuit = (currentCircuit + circuitDirection)%4;
               circuitHalt('A');
               circuitActivateReverse('B');
               break;
@@ -127,6 +126,18 @@ boolean handleCommand(String in) {
       Serial.print(newDelay);
       circuitOn = true;
       delayValue = newDelay;
+      return true;
+    }
+  }
+  if (in.substring(0,4) == "DIR ") {
+    String dir = in.substring(4,5);
+    if (dir == "+") {
+      Serial.print("+ DIR");
+      circuitDirection = 1;
+      return true;
+    } if (dir == "-") {
+      Serial.print("- DIR");
+      circuitDirection = -1;
       return true;
     }
   }
