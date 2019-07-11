@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['gui.py'],
-             pathex=['/home/alex/nanorobotics/magnet_switcher_control/GUI'],
+             pathex=['C:msys64bin', 'C:\\Users\\alexh\\Documents\\EE\\nanorobotics\\magnet_switcher_control\\GUI'],
              binaries=[],
              datas=[],
              hiddenimports=[],
