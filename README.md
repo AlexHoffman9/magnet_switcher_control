@@ -1,4 +1,5 @@
 # magnet_switcher_control
+This code works together to generate a rotating magnetic field with a helmholtz coil using an Arduino Mega and custom hardware
 ## MagnetSwitcher_2019
 Current Arduino code for that controls a single Magnet Switcher PCB using the Arduino Mega shield designed by Alex Hoffman
 
