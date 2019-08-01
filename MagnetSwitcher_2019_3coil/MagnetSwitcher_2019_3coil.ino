@@ -83,7 +83,7 @@ void loop() {
   }
   if (commandBuffer.length() >= COMMAND_LENGTH) { // check if full command received
         commandReady = true;
-        commandIn = commandBuffer.substring(0,COMMAND_LENGTH); // this works for exactly 8 chars. improve by just grabbing 1st 8 chars
+        commandIn = commandBuffer.substring(0,COMMAND_LENGTH);
         commandBuffer = ""; // ignore possibility of pending command after this one
   }
   
